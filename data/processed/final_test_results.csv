@@ -1,0 +1,2 @@
+model,threshold,precision,recall,f1,roc_auc,pr_auc,true_negatives,false_positives,false_negatives,true_positives
+RF_DEEPER,0.5,0.8541666666666666,0.8367346938775511,0.845360824742268,0.9701628769825319,0.8643409757026389,56850,14,16,82

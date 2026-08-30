@@ -1,0 +1,222 @@
+import pandas as pd
+import joblib
+
+from pathlib import Path
+
+from sklearn.metrics import (
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix
+)
+
+
+# ==========================================
+# PATHS
+# ==========================================
+
+ROOT = Path(__file__).resolve().parents[2]
+
+DATA_DIR = ROOT / "data" / "processed"
+MODEL_PATH = ROOT / "ml" / "models" / "baseline_logistic_regression.joblib"
+
+
+# ==========================================
+# LOAD MODEL
+# ==========================================
+
+print("Loading baseline model...")
+
+model = joblib.load(MODEL_PATH)
+
+
+# ==========================================
+# LOAD VALIDATION DATA
+# ==========================================
+
+print("Loading validation data...")
+
+validation = pd.read_csv(DATA_DIR / "validation.csv")
+
+X_val = validation.drop(columns=["Class"])
+y_val = validation["Class"]
+
+
+# ==========================================
+# GET PROBABILITIES
+# ==========================================
+
+print("Generating fraud probabilities...")
+
+probabilities = model.predict_proba(X_val)[:, 1]
+
+
+# ==========================================
+# THRESHOLDS
+# ==========================================
+
+thresholds = [
+    0.10,
+    0.20,
+    0.30,
+    0.40,
+    0.50,
+    0.60,
+    0.70,
+    0.80,
+    0.90,
+]
+
+
+# ==========================================
+# BUSINESS COST ASSUMPTIONS
+# ==========================================
+
+# These are DEMO assumptions for now.
+# We will make them configurable later.
+
+FALSE_POSITIVE_COST = 100
+FALSE_NEGATIVE_COST = 2500
+
+
+# ==========================================
+# EVALUATE
+# ==========================================
+
+results = []
+
+
+for threshold in thresholds:
+
+    predictions = (probabilities >= threshold).astype(int)
+
+    precision = precision_score(
+        y_val,
+        predictions,
+        zero_division=0
+    )
+
+    recall = recall_score(
+        y_val,
+        predictions,
+        zero_division=0
+    )
+
+    f1 = f1_score(
+        y_val,
+        predictions,
+        zero_division=0
+    )
+
+    tn, fp, fn, tp = confusion_matrix(
+        y_val,
+        predictions
+    ).ravel()
+
+    fp_cost = fp * FALSE_POSITIVE_COST
+    fn_cost = fn * FALSE_NEGATIVE_COST
+
+    total_cost = fp_cost + fn_cost
+
+    results.append({
+        "threshold": threshold,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "true_positives": tp,
+        "false_positives": fp,
+        "true_negatives": tn,
+        "false_negatives": fn,
+        "fp_cost": fp_cost,
+        "fn_cost": fn_cost,
+        "total_cost": total_cost
+    })
+
+
+# ==========================================
+# DISPLAY RESULTS
+# ==========================================
+
+results_df = pd.DataFrame(results)
+
+
+print("\n==========================================")
+print("       SENTINEL THRESHOLD ANALYSIS")
+print("==========================================\n")
+
+print(
+    results_df.to_string(
+        index=False,
+        formatters={
+            "precision": "{:.3f}".format,
+            "recall": "{:.3f}".format,
+            "f1": "{:.3f}".format
+        }
+    )
+)
+
+
+# ==========================================
+# BEST THRESHOLD BY COST
+# ==========================================
+
+best = results_df.loc[
+    results_df["total_cost"].idxmin()
+]
+
+
+print("\n==========================================")
+print("       LOWEST COST THRESHOLD")
+print("==========================================")
+
+print(
+    f"\nThreshold: {best['threshold']:.2f}"
+)
+
+print(
+    f"Precision: {best['precision']:.3f}"
+)
+
+print(
+    f"Recall: {best['recall']:.3f}"
+)
+
+print(
+    f"F1: {best['f1']:.3f}"
+)
+
+print(
+    f"False positives: {int(best['false_positives'])}"
+)
+
+print(
+    f"False negatives: {int(best['false_negatives'])}"
+)
+
+print(
+    f"FP cost: ₹{best['fp_cost']:,.0f}"
+)
+
+print(
+    f"FN cost: ₹{best['fn_cost']:,.0f}"
+)
+
+print(
+    f"Total estimated cost: ₹{best['total_cost']:,.0f}"
+)
+
+
+# ==========================================
+# SAVE RESULTS
+# ==========================================
+
+output_path = DATA_DIR / "threshold_results.csv"
+
+results_df.to_csv(
+    output_path,
+    index=False
+)
+
+print(
+    f"\nResults saved to:\n{output_path}"
+)
