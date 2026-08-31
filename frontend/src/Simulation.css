@@ -108,3 +108,136 @@
   border-radius: 8px;
   background: #fee2e2;
 }
+.risk-score-section {
+  margin-top: 30px;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.risk-score-section h3 {
+  margin-bottom: 25px;
+  color: #1e293b;
+}
+
+/* Dynamic Risk Ring */
+
+.risk-ring {
+  --risk-progress: 0deg;
+
+  width: 190px;
+  height: 190px;
+
+  margin: 0 auto 25px;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      #ef4444 var(--risk-progress),
+      #e5e7eb var(--risk-progress)
+    );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  transition:
+    background 0.8s ease,
+    transform 0.3s ease;
+}
+
+.risk-ring::before {
+  content: "";
+
+  position: absolute;
+
+  width: 154px;
+  height: 154px;
+
+  background: white;
+
+  border-radius: 50%;
+}
+
+.risk-ring-inner {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-ring-inner strong {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.risk-ring-inner span {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.risk-ring-inner small {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* LOW */
+
+.risk-ring.low {
+  background:
+    conic-gradient(
+      #22c55e var(--risk-progress),
+      #e5e7eb var(--risk-progress)
+    );
+}
+
+.risk-ring.low .risk-ring-inner small {
+  color: #16a34a;
+}
+
+/* MEDIUM */
+
+.risk-ring.medium {
+  background:
+    conic-gradient(
+      #f59e0b var(--risk-progress),
+      #e5e7eb var(--risk-progress)
+    );
+}
+
+.risk-ring.medium .risk-ring-inner small {
+  color: #d97706;
+}
+
+/* HIGH */
+
+.risk-ring.high {
+  background:
+    conic-gradient(
+      #ef4444 var(--risk-progress),
+      #e5e7eb var(--risk-progress)
+    );
+}
+
+.risk-ring.high .risk-ring-inner small {
+  color: #dc2626;
+}
+
+.risk-summary {
+  margin-top: 10px;
+}
+
+.risk-summary p {
+  margin: 8px 0;
+  color: #475569;
+}

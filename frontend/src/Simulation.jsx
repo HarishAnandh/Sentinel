@@ -3,7 +3,32 @@ import React, { useState } from "react";
 import "./Simulation.css";
 
 const API = "https://sentinel1-wqdp.onrender.com";
+function RiskRing({ score }) {
+  const value = Number(score) || 0;
 
+  let status = "LOW";
+
+  if (value >= 70) {
+    status = "HIGH";
+  } else if (value >= 30) {
+    status = "MEDIUM";
+  }
+
+  return (
+    <div
+      className={`risk-ring ${status.toLowerCase()}`}
+      style={{
+        "--risk-progress": `${value * 3.6}deg`,
+      }}
+    >
+      <div className="risk-ring-inner">
+        <strong>{value.toFixed(2)}</strong>
+        <span>/ 100</span>
+        <small>{status} RISK</small>
+      </div>
+    </div>
+  );
+}
 function Simulation() {
   const [form, setForm] = useState({
     amount: "",
@@ -164,14 +189,24 @@ function Simulation() {
 
           <h2>Sentinel AI Analysis</h2>
 
-          <div className="risk-score">
-            <span>Risk Score</span>
+          <div className="risk-score-section">
+            <h3>AI Risk Assessment</h3>
 
-            <strong>
-              {result.risk?.risk_score ?? "--"}
-            </strong>
+            <RiskRing
+              score={result.risk?.risk_score}
+            />
 
-            <small>/ 100</small>
+            <div className="risk-summary">
+              <p>
+                <strong>Decision:</strong>{" "}
+                {result.risk?.decision}
+              </p>
+
+              <p>
+                <strong>Fraud Probability:</strong>{" "}
+                {result.risk?.risk_probability}
+              </p>
+            </div>
           </div>
 
           <div className="risk-info">

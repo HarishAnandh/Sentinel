@@ -701,137 +701,176 @@ function App() {
 
               <>
 
-                <div className="risk-score">
+<div className="risk-summary">
 
-                  <div
-                    className={
-                      "score-ring " +
-                      selected.risk_level
-                        .toLowerCase()
-                    }
-                  >
+  <div
+    className={
+      "score-ring " +
+      selected.risk_level.toLowerCase()
+    }
+    style={{
+      "--risk-score": `${Math.min(
+        Number(selected.risk_score || 0),
+        100
+      ) * 3.6}deg`
+    }}
+  >
+    <div className="score-ring-inner">
+      <strong>
+        {Number(selected.risk_score || 0).toFixed(1)}
+      </strong>
 
-                    <strong>
-                      {selected.risk_score}
-                    </strong>
-
-                    <span>
-                      / 100
-                    </span>
-
-                  </div>
-
-
-                  <div>
-
-                    <RiskBadge
-                      level={
-                        selected.risk_level
-                      }
-                    />
-
-                    
-
-                    <p className="probability">
-
-                      Fraud probability{" "}
-
-                      <strong>
-
-                        {(
-                          selected.risk_probability *
-                          100
-                        ).toFixed(2)}
-                        %
-
-                      </strong>
-
-                    </p>
-
-                  <div className="risk-context">
-                    {selected.risk_level === "HIGH"
-                      ? "Transaction requires immediate verification."
-                      : selected.risk_level === "MEDIUM"
-                      ? "Transaction requires additional review."
-                      : "Transaction appears within normal risk range."}
-                  </div>
-
-                  </div>
-
-                </div>
+      <span>/ 100</span>
+    </div>
+  </div>
 
 
-                <div className="decision-box">
-                  <div className="decision-label">
-                    <Clock3 size={15} />
-                    <span>RECOMMENDED ACTION</span>
-                  </div>
+  <div className="risk-summary-info">
 
-                  <strong>
-                    {selected.decision.replaceAll("_", " ")}
-                  </strong>
+    <div className="risk-summary-top">
 
-                  <p>
-                    {selected.decision === "HOLD_AND_VERIFY"
-                      ? "Payment should be temporarily held while the transaction is verified."
-                      : selected.decision === "REVIEW"
-                      ? "Transaction should be reviewed before final approval."
-                      : "Transaction can proceed normally."}
-                  </p>
-                </div>
+      <RiskBadge
+        level={selected.risk_level}
+      />
+
+      <span className="risk-summary-label">
+        SENTINEL RISK SCORE
+      </span>
+
+    </div>
 
 
-                <div className="explanation">
+    <div className="fraud-probability">
 
-  <h3>
-    Why Sentinel flagged this transaction
-  </h3>
+      <span>
+        Fraud probability
+      </span>
+
+      <strong>
+        {(
+          Number(selected.risk_probability || 0) * 100
+        ).toFixed(2)}%
+      </strong>
+
+    </div>
+
+
+    <p className="risk-context">
+
+      {selected.risk_level === "HIGH"
+        ? "Transaction requires immediate verification."
+        : selected.risk_level === "MEDIUM"
+        ? "Transaction requires additional review."
+        : "Transaction appears within normal risk range."}
+
+    </p>
+
+  </div>
+
+</div>
+
+
+<div className="decision-box">
+
+<div className="decision-icon">
+  {selected.decision === "APPROVE" ? (
+    <CheckCircle2 size={20} />
+  ) : (
+    <Clock3 size={20} />
+  )}
+</div>
+
+<div className="decision-content">
+
+  <span className="decision-label">
+    RECOMMENDED ACTION
+  </span>
+
+  <strong>
+    {selected.decision.replaceAll("_", " ")}
+  </strong>
 
   <p>
-    The Random Forest risk model identified
-    transaction patterns associated with
-    previously observed fraudulent activity.
+    {selected.decision === "HOLD_AND_VERIFY"
+      ? "Payment should be temporarily held while the transaction is verified."
+      : selected.decision === "REVIEW"
+      ? "Transaction should be reviewed before final approval."
+      : "Transaction can proceed normally."}
   </p>
+
+</div>
+
+</div>
+
+<div className="explanation">
+
+  <div className="explanation-header">
+
+    <div>
+      <h3>Risk Signals</h3>
+
+      <p>
+        Key model features influencing this assessment
+      </p>
+    </div>
+
+  </div>
 
 
   <div className="signal-list">
-  {selected.signals?.map((signal) => (
-    <div className="signal" key={signal.feature}>
-      <div className="signal-name">
-        {signal.feature}
+
+    {selected.signals?.map((signal) => (
+
+      <div
+        className="signal"
+        key={signal.feature}
+      >
+
+        <div className="signal-top">
+
+          <strong>
+            {signal.feature}
+          </strong>
+
+          <span>
+            {signal.importance >= 0.15
+              ? "High impact"
+              : signal.importance >= 0.08
+              ? "Significant"
+              : "Moderate"}
+          </span>
+
+        </div>
+
+
+        <div className="signal-bar">
+
+          <div
+            className="signal-fill"
+            style={{
+              width: `${Math.min(
+                signal.importance * 500,
+                100
+              )}%`
+            }}
+          />
+
+        </div>
+
       </div>
 
-      <div className="signal-bar">
-        <div
-          className="signal-fill"
-          style={{
-            width: `${Math.min(
-              signal.importance * 500,
-              100
-            )}%`
-          }}
-        />
-      </div>
+    ))}
 
-      <span>
-        {signal.importance >= 0.15
-          ? "High impact"
-          : signal.importance >= 0.08
-          ? "Significant"
-          : "Moderate"}
-      </span>
-    </div>
-  ))}
-</div>
+  </div>
 
 
   <div className="model-note">
 
-    <ShieldCheck size={15} />
+    <ShieldCheck size={16} />
 
     <span>
-      Explanation based on Sentinel's
-      Random Forest feature importance.
+      Assessment generated by Sentinel's RF_DEEPER
+      Random Forest risk model.
     </span>
 
   </div>
