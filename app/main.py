@@ -71,6 +71,12 @@ class Transaction(BaseModel):
     Amount: float
 
 
+class SimulationTransaction(BaseModel):
+    amount: float
+    time: float
+    device_status: str
+    transaction_frequency: int
+    unusual_time: bool
 # ==========================================
 # ROOT
 # ==========================================
@@ -184,3 +190,40 @@ if FRONTEND_DIST.exists():
             return FileResponse(requested_file)
 
         return FileResponse(FRONTEND_DIST / "index.html")
+    
+
+@app.post("/api/v1/simulation")
+def simulate_transaction(transaction: SimulationTransaction):
+    try:
+        # Start with a neutral feature vector.
+        simulated = {
+            "Time": transaction.time,
+            "Amount": transaction.amount,
+        }
+
+        for i in range(1, 29):
+            simulated[f"V{i}"] = 0.0
+
+        # Simulation adjustments.
+        if transaction.device_status.lower() == "new":
+            simulated["V14"] = -4.0
+
+        if transaction.transaction_frequency >= 10:
+            simulated["V10"] = -3.0
+
+        if transaction.unusual_time:
+            simulated["V4"] = 4.0
+
+        result = assess_transaction(simulated)
+
+        return {
+            "status": "success",
+            "simulation": transaction.model_dump(),
+            "risk": result
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

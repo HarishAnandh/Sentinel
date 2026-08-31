@@ -1,0 +1,232 @@
+
+import React, { useState } from "react";
+import "./Simulation.css";
+
+const API = "https://sentinel1-wqdp.onrender.com";
+
+function Simulation() {
+  const [form, setForm] = useState({
+    amount: "",
+    time: "",
+    device_status: "existing",
+    transaction_frequency: 1,
+    unusual_time: false,
+  });
+
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const analyzeTransaction = async () => {
+    if (!form.amount || !form.time) {
+      setResult({
+        error: "Please enter the transaction amount and time.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await fetch(`${API}/api/v1/simulation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: Number(form.amount),
+          time: Number(form.time),
+          device_status: form.device_status,
+          transaction_frequency: Number(form.transaction_frequency),
+          unusual_time: form.unusual_time,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("API request failed");
+      }
+
+      const data = await response.json();
+
+      setResult(data);
+    } catch (error) {
+      console.error("Simulation error:", error);
+
+      setResult({
+        error:
+          "Unable to connect to Sentinel backend. Please make sure the API is running.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="simulation-page">
+
+      <div className="simulation-header">
+        <h1>Transaction Simulation</h1>
+        <p>
+          Simulate a transaction and evaluate its fraud risk using Sentinel AI.
+        </p>
+      </div>
+
+      <div className="simulation-card">
+
+        <div className="input-group">
+          <label>Transaction Amount</label>
+
+          <input
+            type="number"
+            name="amount"
+            placeholder="Enter transaction amount"
+            value={form.amount}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Transaction Time</label>
+
+          <input
+            type="number"
+            name="time"
+            placeholder="Example: 82000"
+            value={form.time}
+            onChange={handleChange}
+          />
+
+          <small>
+            Use the dataset time format. Example: 82000.
+          </small>
+        </div>
+
+        <div className="input-group">
+          <label>Device Status</label>
+
+          <select
+            name="device_status"
+            value={form.device_status}
+            onChange={handleChange}
+          >
+            <option value="existing">Existing Device</option>
+            <option value="new">New Device</option>
+          </select>
+        </div>
+
+        <div className="input-group">
+          <label>Transactions in Recent Period</label>
+
+          <input
+            type="number"
+            name="transaction_frequency"
+            min="1"
+            value={form.transaction_frequency}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="checkbox-group">
+          <input
+            type="checkbox"
+            id="unusual_time"
+            name="unusual_time"
+            checked={form.unusual_time}
+            onChange={handleChange}
+          />
+
+          <label htmlFor="unusual_time">
+            Transaction occurred at an unusual time
+          </label>
+        </div>
+
+        <button
+          className="analyze-button"
+          onClick={analyzeTransaction}
+          disabled={loading}
+        >
+          {loading ? "Analyzing..." : "Analyze Transaction"}
+        </button>
+
+      </div>
+
+      {result && !result.error && (
+        <div className="simulation-result">
+
+          <h2>Sentinel AI Analysis</h2>
+
+          <div className="risk-score">
+            <span>Risk Score</span>
+
+            <strong>
+              {result.risk?.risk_score ?? "--"}
+            </strong>
+
+            <small>/ 100</small>
+          </div>
+
+          <div className="risk-info">
+
+            <p>
+              <strong>Risk Level:</strong>{" "}
+              {result.risk?.risk_level ?? "Unknown"}
+            </p>
+
+            <p>
+              <strong>Decision:</strong>{" "}
+              {result.risk?.decision ?? "Unknown"}
+            </p>
+
+            <p>
+              <strong>Fraud Probability:</strong>{" "}
+              {result.risk?.risk_probability ?? "Unknown"}
+            </p>
+
+          </div>
+
+          {result.risk?.signals?.length > 0 && (
+            <div className="signals">
+
+              <h3>Risk Signals</h3>
+
+              {result.risk.signals.map((signal, index) => (
+                <div className="signal" key={index}>
+
+                  <strong>
+                    {signal.feature}
+                  </strong>
+
+                  <span>
+                    {signal.severity}
+                  </span>
+
+                </div>
+              ))}
+
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {result?.error && (
+        <div className="simulation-error">
+          {result.error}
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+export default Simulation;
+

@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Clock3
 } from "lucide-react";
-
+import Simulation from "./Simulation";
 import "./index.css";
 
 const API = "https://sentinel1-wqdp.onrender.com";
@@ -222,7 +222,16 @@ function App() {
               <CreditCard size={18} />
               Transactions
             </div>
-
+            <div
+              className={
+                "nav-item " +
+                (activePage === "simulation" ? "active" : "")
+              }
+              onClick={() => setActivePage("simulation")}
+            >
+              <RefreshCw size={18} />
+              Simulation
+            </div>
             <div
               className={
                 "nav-item " +
@@ -333,11 +342,13 @@ function App() {
           </header>
 
           {activePage === "transactions" ? (
-            <TransactionsPage
-              transactions={transactions}
-              onSelect={setSelected}
-            />
-          ) : activePage === "queue" ? (
+              <TransactionsPage
+                transactions={transactions}
+                onSelect={setSelected}
+              />
+            ) : activePage === "simulation" ? (
+              <Simulation />
+            ) : activePage === "queue" ? (
             <RiskQueuePage
               transactions={transactions}
               onSelect={setSelected}
