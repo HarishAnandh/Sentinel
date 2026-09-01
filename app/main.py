@@ -115,7 +115,7 @@ def health():
 
     return {
         "status": "healthy",
-        "model": "RF_DEEPER",
+        "model": "RF_DEEPER_CALIBRATED",
         "model_loaded": True
     }
 
