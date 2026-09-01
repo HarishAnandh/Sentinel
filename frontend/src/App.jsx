@@ -1,9 +1,12 @@
+
+import CSVAnalyzer from "./CSVAnalyzer";
 import { useEffect, useState } from "react";
 
 import {
   ShieldCheck,
   LayoutDashboard,
   CreditCard,
+  Upload,
   AlertTriangle,
   BarChart3,
   Settings,
@@ -225,6 +228,16 @@ function App() {
             <div
               className={
                 "nav-item " +
+                (activePage === "csv-analyzer" ? "active" : "")
+              }
+              onClick={() => setActivePage("csv-analyzer")}
+            >
+              <Upload size={18} />
+              CSV Analyzer
+            </div>
+            <div
+              className={
+                "nav-item " +
                 (activePage === "simulation" ? "active" : "")
               }
               onClick={() => setActivePage("simulation")}
@@ -232,6 +245,7 @@ function App() {
               <RefreshCw size={18} />
               Simulation
             </div>
+
             <div
               className={
                 "nav-item " +
@@ -348,6 +362,8 @@ function App() {
               />
             ) : activePage === "simulation" ? (
               <Simulation />
+            ) : activePage === "csv-analyzer" ? (
+              <CSVAnalyzer />
             ) : activePage === "queue" ? (
             <RiskQueuePage
               transactions={transactions}

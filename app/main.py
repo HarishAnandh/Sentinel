@@ -1,3 +1,6 @@
+import joblib
+from fastapi import UploadFile, File
+from app.csv_analyzer import analyze_csv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +15,18 @@ from app.transaction_service import (
     get_normal_transaction
 )
 
+# ==========================================
+# LOAD CALIBRATED SENTINEL MODEL
+# ==========================================
+
+MODEL_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "ml"
+    / "models"
+    / "RF_DEEPER_CALIBRATED.joblib"
+)
+
+model = joblib.load(MODEL_PATH)
 
 # ==========================================
 # FASTAPI APPLICATION
@@ -172,7 +187,15 @@ def demo_fraud():
         "risk": risk
     }
 
-
+@app.post("/api/v1/analyze/csv")
+async def analyze_transaction_csv(
+    file: UploadFile = File(...)
+):
+    result = await analyze_csv(file, model)
+    return {
+        "status": "success",
+        **result
+    }
 # ==========================================
 # SERVE REACT FRONTEND
 # ==========================================
