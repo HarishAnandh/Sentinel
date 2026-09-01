@@ -1142,71 +1142,57 @@ button:disabled {
 ========================================== */
 
 .score-ring {
-  --risk-score: 0deg;
+  --risk-score: 0%;
 
   width: 150px;
   height: 150px;
-
-  flex-shrink: 0;
-
   border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   background:
     conic-gradient(
       currentColor var(--risk-score),
-      #edf0f4 var(--risk-score)
+      #e8edf3 var(--risk-score)
     );
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   position: relative;
+  flex-shrink: 0;
 }
-
 
 .score-ring::before {
   content: "";
-
   position: absolute;
 
-  width: 124px;
-  height: 124px;
-
-  border-radius: 50%;
+  width: 116px;
+  height: 116px;
 
   background: white;
+  border-radius: 50%;
 }
-
 
 .score-ring-inner {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
 }
 
-
-.score-ring-inner strong {
-  font-size: 34px;
-  line-height: 1;
-
+.score-ring strong {
+  font-size: 30px;
   font-weight: 700;
-
-  color: #1f2937;
+  line-height: 1;
 }
 
-
-.score-ring-inner span {
-  margin-top: 6px;
-
-  font-size: 13px;
-
-  color: #94a3b8;
+.score-ring span {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 
@@ -1215,15 +1201,15 @@ button:disabled {
 ========================================== */
 
 .score-ring.low {
-  color: #63c59a;
+  color: #22c55e;
 }
 
 .score-ring.medium {
-  color: #e7b95b;
+  color: #f59e0b;
 }
 
 .score-ring.high {
-  color: #e87575;
+  color: #ef4444;
 }
 
 

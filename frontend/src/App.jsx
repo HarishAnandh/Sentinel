@@ -15,7 +15,7 @@ import {
 import Simulation from "./Simulation";
 import "./index.css";
 
-const API = "https://sentinel1-wqdp.onrender.com";
+const API = "http://127.0.0.1:8000";
 
 
 function App() {
@@ -709,15 +709,12 @@ function App() {
       selected.risk_level.toLowerCase()
     }
     style={{
-      "--risk-score": `${Math.min(
-        Number(selected.risk_score || 0),
-        100
-      ) * 3.6}deg`
+      "--risk-score": `${Number(selected.risk_score)}%`
     }}
   >
     <div className="score-ring-inner">
       <strong>
-        {Number(selected.risk_score || 0).toFixed(1)}
+        {Number(selected.risk_score).toFixed(1)}
       </strong>
 
       <span>/ 100</span>

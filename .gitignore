@@ -1,11 +1,31 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+
+# Environment
+.env
+.env.*
+
+# macOS
 .DS_Store
 
-frontend/node_modules/
-frontend/dist/
+# Node
 node_modules/
+frontend/node_modules/
+
+# Frontend build
+frontend/dist/
+
+# Raw datasets
 data/raw/
-data/raw/
+
+# Large processed datasets
 data/processed/train.csv
+data/processed/test.csv
+data/processed/validation.csv
+
+# IDE
+.vscode/
+.idea/

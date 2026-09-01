@@ -14,7 +14,7 @@ MODEL_PATH = (
     ROOT
     / "ml"
     / "models"
-    / "RF_DEEPER.joblib"
+    / "RF_DEEPER_CALIBRATED.joblib"
 )
 
 
@@ -64,7 +64,11 @@ FEATURES = [
     "Amount"
 ]
 
+# ==========================================
+# PRODUCTION RISK THRESHOLD
+# ==========================================
 
+FRAUD_THRESHOLD = 0.60
 # ==========================================
 # RISK LEVEL
 # ==========================================
@@ -85,16 +89,16 @@ def get_risk_level(risk_score):
 # MERCHANT ACTION
 # ==========================================
 
-def get_action(risk_score):
+FRAUD_THRESHOLD = 0.60
 
-    if risk_score < 30:
-        return "APPROVE"
 
-    elif risk_score < 70:
-        return "REVIEW"
-
-    else:
+def get_action(fraud_probability):
+    if fraud_probability >= FRAUD_THRESHOLD:
         return "HOLD_AND_VERIFY"
+    elif fraud_probability >= 0.30:
+        return "REVIEW"
+    else:
+        return "APPROVE"
 
 
 # ==========================================
@@ -157,17 +161,23 @@ def assess_transaction(transaction):
     # --------------------------------------
 
     action = get_action(
-        risk_score
+        fraud_probability
     )
 
 
         # --------------------------------------
     # Model-level feature importance
     # --------------------------------------
+
+    # CalibratedClassifierCV wraps the original
+# Random Forest model inside calibrated_classifiers_
+
+    base_model = model.calibrated_classifiers_[0].estimator
+
     feature_importance = dict(
         zip(
             FEATURES,
-            model.feature_importances_
+            base_model.feature_importances_
         )
     )
 
