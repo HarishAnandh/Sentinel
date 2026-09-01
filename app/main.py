@@ -112,7 +112,6 @@ def root():
 
 @app.get("/health")
 def health():
-
     return {
         "status": "healthy",
         "model": "RF_DEEPER_CALIBRATED",
