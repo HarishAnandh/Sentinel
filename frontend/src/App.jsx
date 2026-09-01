@@ -1221,19 +1221,19 @@ function AnalyticsPage() {
 
         <div className="card analytics-card">
           <span>Precision</span>
-          <strong>85.42%</strong>
-          <small>Fraud detection accuracy</small>
+          <strong>94.94%</strong>
+          <small>Fraud alerts correctly identified</small>
         </div>
 
         <div className="card analytics-card">
           <span>Recall</span>
-          <strong>83.67%</strong>
-          <small>Fraud cases detected</small>
+          <strong>76.53%</strong>
+          <small>Fraud cases successfully detected</small>
         </div>
 
         <div className="card analytics-card">
           <span>F1 Score</span>
-          <strong>84.54%</strong>
+          <strong>84.75%</strong>
           <small>Balanced model performance</small>
         </div>
 
@@ -1254,7 +1254,7 @@ function AnalyticsPage() {
           <div>
             <h2>Model Performance</h2>
             <p>
-              Final hold-out test evaluation
+              Calibrated model · Hold-out test evaluation
             </p>
           </div>
         </div>
@@ -1273,22 +1273,22 @@ function AnalyticsPage() {
 
           <div>
             <span>Fraud detected</span>
-            <strong>82 / 98</strong>
+            <strong>75 / 98</strong>
           </div>
 
           <div>
             <span>False alerts</span>
-            <strong>14</strong>
+            <strong>4</strong>
           </div>
 
           <div>
             <span>False alert rate</span>
-            <strong>0.0246%</strong>
+            <strong>0.0070%</strong>
           </div>
 
           <div>
-            <span>Active model</span>
-            <strong>RF_DEEPER</strong>
+            <span>Decision threshold</span>
+            <strong>0.60</strong>
           </div>
 
         </div>
@@ -1382,7 +1382,7 @@ function SettingsPage() {
               <span>Production fraud detection model</span>
             </div>
 
-            <strong>RF_DEEPER</strong>
+            <strong>RF_DEEPER_CALIBRATED</strong>
           </div>
 
           <div className="setting-row">
@@ -1391,7 +1391,7 @@ function SettingsPage() {
               <span>Probability threshold for fraud classification</span>
             </div>
 
-            <strong>0.50</strong>
+            <strong>0.60</strong>
           </div>
 
           <div className="setting-row">
