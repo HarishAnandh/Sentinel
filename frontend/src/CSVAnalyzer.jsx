@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./CSVAnalyzer.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://sentinel1-wqdp.onrender.com";
 
 function CSVAnalyzer() {
   const [file, setFile] = useState(null);
