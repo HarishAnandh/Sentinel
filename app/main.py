@@ -114,7 +114,7 @@ def root():
 def health():
     return {
         "status": "healthy",
-        "model": "RF_DEEPER_CALIBRATED",
+        "model": "RF_DEEPER",
         "model_loaded": True
     }
 
