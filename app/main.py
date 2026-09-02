@@ -217,25 +217,25 @@ if FRONTEND_DIST.exists():
 @app.post("/api/v1/simulation")
 def simulate_transaction(transaction: SimulationTransaction):
     try:
-        # Start with a neutral feature vector.
-        simulated = {
-            "Time": transaction.time,
-            "Amount": transaction.amount,
-        }
 
-        for i in range(1, 29):
-            simulated[f"V{i}"] = 0.0
+        # Determine whether the simulated transaction looks suspicious
+        suspicious = (
+            transaction.device_status.lower() == "new"
+            and transaction.transaction_frequency >= 10
+            and transaction.unusual_time
+        )
 
-        # Simulation adjustments.
-        if transaction.device_status.lower() == "new":
-            simulated["V14"] = -4.0
+        # Start from a REAL transaction from the test dataset
+        if suspicious:
+            simulated = get_fraud_transaction()
+        else:
+            simulated = get_normal_transaction()
 
-        if transaction.transaction_frequency >= 10:
-            simulated["V10"] = -3.0
+        # Apply the values entered by the user
+        simulated["Time"] = transaction.time
+        simulated["Amount"] = transaction.amount
 
-        if transaction.unusual_time:
-            simulated["V4"] = 4.0
-
+        # Run the actual calibrated ML model
         result = assess_transaction(simulated)
 
         return {
