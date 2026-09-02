@@ -217,25 +217,55 @@ if FRONTEND_DIST.exists():
 @app.post("/api/v1/simulation")
 def simulate_transaction(transaction: SimulationTransaction):
     try:
+        # Count suspicious signals
+        risk_signals = 0
 
-        # Determine whether the simulated transaction looks suspicious
-        suspicious = (
-            transaction.device_status.lower() == "new"
-            and transaction.transaction_frequency >= 10
-            and transaction.unusual_time
-        )
+        if transaction.device_status.lower() == "new":
+            risk_signals += 1
 
-        # Start from a REAL transaction from the test dataset
-        if suspicious:
-            simulated = get_fraud_transaction()
-        else:
+        if transaction.transaction_frequency >= 10:
+            risk_signals += 1
+
+        if transaction.unusual_time:
+            risk_signals += 1
+
+        # --------------------------------------------------
+        # LOW RISK
+        # 0 suspicious signals -> real normal transaction
+        # --------------------------------------------------
+        if risk_signals == 0:
             simulated = get_normal_transaction()
 
-        # Apply the values entered by the user
+        # --------------------------------------------------
+        # MEDIUM RISK
+        # 1 suspicious signal -> real normal transaction
+        # with a controlled anomaly added
+        # --------------------------------------------------
+        elif risk_signals == 1:
+            simulated = get_normal_transaction()
+
+            # Add a moderate anomaly
+            if transaction.device_status.lower() == "new":
+                simulated["V14"] = -2.5
+
+            if transaction.transaction_frequency >= 10:
+                simulated["V10"] = -1.8
+
+            if transaction.unusual_time:
+                simulated["V4"] = 2.5
+
+        # --------------------------------------------------
+        # HIGH RISK
+        # 2 or 3 suspicious signals -> real fraud transaction
+        # --------------------------------------------------
+        else:
+            simulated = get_fraud_transaction()
+
+        # Keep user's entered transaction details
         simulated["Time"] = transaction.time
         simulated["Amount"] = transaction.amount
 
-        # Run the actual calibrated ML model
+        # Run through Sentinel ML risk engine
         result = assess_transaction(simulated)
 
         return {
@@ -245,7 +275,4 @@ def simulate_transaction(transaction: SimulationTransaction):
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=500, detail=str(e))
