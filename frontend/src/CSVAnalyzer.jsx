@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./CSVAnalyzer.css";
-
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 const API_URL = "https://sentinel1-wqdp.onrender.com";
 
 function CSVAnalyzer() {
@@ -211,12 +211,94 @@ function CSVAnalyzer() {
             </div>
 
           </div>
+          {/* RISK DISTRIBUTION */}
+
+<div className="csv-risk-chart-card">
+
+<div className="csv-risk-chart-info">
+  <h2>Risk Distribution</h2>
+  <p>Transaction risk classification from the uploaded dataset.</p>
+
+  <div className="csv-risk-legend">
+
+    <div>
+      <span className="legend-dot high"></span>
+      <span>High Risk</span>
+      <strong>{analysis.high_risk}</strong>
+    </div>
+
+    <div>
+      <span className="legend-dot medium"></span>
+      <span>Medium Risk</span>
+      <strong>{analysis.medium_risk}</strong>
+    </div>
+
+    <div>
+      <span className="legend-dot low"></span>
+      <span>Low Risk</span>
+      <strong>{analysis.low_risk}</strong>
+    </div>
+
+  </div>
+</div>
+
+<div className="csv-risk-chart">
+
+  <ResponsiveContainer width="100%" height={240}>
+
+    <PieChart>
+
+      <Pie
+        data={[
+          {
+            name: "High Risk",
+            value: analysis.high_risk
+          },
+          {
+            name: "Medium Risk",
+            value: analysis.medium_risk
+          },
+          {
+            name: "Low Risk",
+            value: analysis.low_risk
+          }
+        ]}
+        cx="50%"
+        cy="50%"
+        innerRadius={72}
+        outerRadius={95}
+        paddingAngle={3}
+        dataKey="value"
+        stroke="none"
+      >
+
+        <Cell fill="#dc2626" />
+        <Cell fill="#d97706" />
+        <Cell fill="#16a34a" />
+
+      </Pie>
+
+    </PieChart>
+
+  </ResponsiveContainer>
+
+  <div className="csv-chart-center">
+    <strong>
+      {analysis.total_transactions.toLocaleString()}
+    </strong>
+    <span>Transactions</span>
+  </div>
+
+</div>
+
+</div>
 
 
-          {/* RESULTS TABLE */}
+{/* RESULTS TABLE */}
 
-          <div className="csv-table-card">
+<div className="csv-table-card">
 
+        
             <div className="csv-table-header">
               <div>
                 <h2>Transaction Risk Results</h2>

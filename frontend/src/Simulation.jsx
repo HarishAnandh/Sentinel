@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./Simulation.css";
 
-const API = "https://sentinel1-wqdp.onrender.com";
+const API = "http://127.0.0.1:8000";
 function RiskRing({ score }) {
   const value = Number(score) || 0;
 
