@@ -1,233 +1,212 @@
 
 # 🛡️ Sentinel — AI Risk Manager
 
-### AI-Powered Fraud Detection & Transaction Risk Intelligence
+### AI-Powered Merchant Fraud Detection, Risk Assessment & Transaction Intelligence
 
-Sentinel is an AI-powered transaction risk management platform designed to help merchants detect potentially fraudulent transactions before they result in financial loss through fraud, chargebacks, and transaction abuse.
+Sentinel is an AI-powered risk management platform designed to help merchants identify potentially fraudulent transactions before they result in financial losses.
 
-The platform combines a calibrated Machine Learning model with a real-time risk engine, transaction simulation, risk queue, analytics dashboard, and batch CSV analysis.
+The system combines a **calibrated Random Forest fraud detection model**, real-time transaction assessment, batch CSV analysis, risk scoring, transaction simulation, merchant configuration, risk alerts, and an interactive risk dashboard.
+
+Instead of simply returning a binary `fraud / not fraud` prediction, Sentinel converts model output into an actionable risk decision:
+
+> **APPROVE → REVIEW → HOLD & VERIFY**
 
 ---
 
-## 🚀 Live Demo
+# 🚀 Live Demo
 
 ### Frontend
-https://sentinel-tawny-psi.vercel.app
+
+🔗 https://sentinel-tawny-psi.vercel.app
 
 ### Backend API
-https://sentinel1-wqdp.onrender.com
 
-### API Documentation
-https://sentinel1-wqdp.onrender.com/docs
+🔗 https://sentinel1-wqdp.onrender.com
 
----
-
-# 🎯 Project Objective
-
-Sentinel aims to provide merchants with an intelligent and explainable fraud-risk assessment system.
-
-### Key objectives
-
-- Detect potentially fraudulent transactions using Machine Learning.
-- Convert model predictions into an interpretable risk score from 0–100.
-- Classify transactions into LOW, MEDIUM, and HIGH risk.
-- Automatically recommend actions such as `APPROVE` or `HOLD_AND_VERIFY`.
-- Reduce unnecessary false-positive alerts.
-- Provide explainable risk signals using feature importance.
-- Support real-time transaction assessment through REST APIs.
-- Support batch fraud analysis through CSV uploads.
-- Provide a visual risk queue for high-risk transactions.
-- Allow users to simulate transaction scenarios and observe risk changes.
-- Provide measurable model performance using a held-out test set.
+The frontend is deployed on **Vercel**, while the FastAPI backend and machine-learning inference engine are deployed on **Render**.
 
 ---
 
-# 💡 Why Sentinel?
+# 🎯 Problem Statement
 
-Traditional rule-based fraud systems often struggle with:
+Fraud, chargebacks, transaction abuse, and suspicious payment activity can silently reduce merchant margins.
 
-- Increasing transaction volume
-- Complex fraud patterns
-- False-positive alerts
-- Manual investigation overhead
-- Lack of explainability
-- Difficulty adapting to changing transaction behavior
+Traditional fraud detection systems often provide only a binary prediction, making it difficult for merchants to understand:
 
-Sentinel addresses these challenges by combining Machine Learning with a transparent risk-management layer.
+- How risky a transaction actually is
+- Why a transaction was flagged
+- Which signals contributed to the risk
+- Whether the transaction should be approved or manually verified
+- How an entire batch of transactions is performing
+- How false positives affect operational review costs
 
-Instead of simply returning:
-
-> Fraud / Not Fraud
-
-Sentinel provides:
-
-> **Risk Score → Probability → Risk Level → Decision → Risk Signals**
-
-This makes the system more useful for an actual merchant risk-management workflow.
+Sentinel addresses this by providing an **interpretable transaction-risk workflow** rather than just a raw ML prediction.
 
 ---
 
-# 🧠 Machine Learning Model
+# 💡 Solution
 
-Sentinel uses a **Random Forest-based fraud detection model** trained on transaction-level fraud data.
+Sentinel evaluates transaction data using a trained and calibrated Random Forest model.
 
-The final production model uses probability calibration to produce more meaningful fraud-risk probabilities.
+The model generates a fraud probability, which is converted into:
 
-### Production model
+- Risk Score
+- Risk Level
+- Decision
+- Risk Signals
+- Feature Importance
+
+The platform also supports **batch CSV analysis**, transaction simulation, merchant configuration, and in-app risk alerts.
+
+---
+
+# ✨ Key Features
+
+## 🔍 1. Real-Time Transaction Risk Assessment
+
+Analyze individual transactions through the risk engine.
+
+Each transaction receives:
+
+- Fraud probability
+- Risk score
+- Risk level
+- Recommended action
+- Important risk signals
+
+Example:
 
 ```text
-RF_DEEPER_CALIBRATED
+Risk Score       : 98.28 / 100
+Risk Probability : 0.9828
+Risk Level       : HIGH
+Decision         : HOLD_AND_VERIFY
 ````
 
-### Model pipeline
+---
 
-```text
-Transaction
-     ↓
-Feature Extraction
-     ↓
-Random Forest Model
-     ↓
-Probability Calibration
-     ↓
-Fraud Probability
-     ↓
-Risk Score (0–100)
-     ↓
-Risk Classification
-     ↓
-Recommended Action
-```
+## 📊 2. Risk Classification
+
+Sentinel converts risk scores into three risk categories:
+
+| Risk Score | Risk Level |
+| ---------- | ---------- |
+| 0–29.99    | LOW        |
+| 30–69.99   | MEDIUM     |
+| 70–100     | HIGH       |
+
+This gives merchants a simple way to prioritize suspicious transactions.
 
 ---
 
-# 📊 Model Performance
+# 🚦 3. Decision Engine
 
-Sentinel evaluates its model using a **held-out test dataset**, rather than reporting training performance.
-
-### Final evaluation
-
-| Metric             |        Result |
-| ------------------ | ------------: |
-| Precision          |    **94.94%** |
-| Recall             |    **76.53%** |
-| F1 Score           |    **84.75%** |
-| ROC-AUC            |    **97.02%** |
-| PR-AUC             |    **86.43%** |
-| Test Transactions  |    **56,962** |
-| Actual Fraud Cases |        **98** |
-| Fraud Detected     |   **75 / 98** |
-| False Positives    |         **4** |
-| False Alert Rate   | **0.007034%** |
-| Decision Threshold |      **0.60** |
-
-The model prioritizes **high precision** to reduce unnecessary fraud alerts while maintaining useful fraud detection coverage.
-
----
-
-# 📈 Precision Optimization History
-
-During development, Sentinel's model performance and decision threshold were iteratively evaluated.
-
-The initial dashboard reported:
+Sentinel translates model probability into an operational decision.
 
 ```text
-Precision: 85.42%
+Low Risk
+   ↓
+APPROVE
+
+Medium Risk
+   ↓
+REVIEW
+
+High Risk
+   ↓
+HOLD & VERIFY
 ```
 
-After model calibration, threshold evaluation, and refinement of the final production configuration, the reported precision improved to:
-
-```text
-Precision: 94.94%
-```
-
-This improvement was achieved by evaluating different Random Forest configurations, calibration strategies, and fraud-decision thresholds on held-out validation/test data.
-
-The goal was not simply to maximize one metric, but to find a practical balance between:
-
-* Precision
-* Recall
-* F1 Score
-* False-positive rate
-* Fraud detection coverage
-
-This resulted in the final production decision threshold of:
+The current fraud decision threshold is:
 
 ```text
 0.60
 ```
 
----
-
-# ⚙️ Risk Engine
-
-Sentinel converts the model's fraud probability into an actionable risk score.
-
-```text
-Risk Score = Fraud Probability × 100
-```
-
-### Risk classification
-
-```text
-0–29.99    → LOW
-30–69.99   → MEDIUM
-70–100     → HIGH
-```
-
-### Decision logic
-
-```text
-Probability < 0.60
-        ↓
-     APPROVE
-
-Probability ≥ 0.60
-        ↓
- HOLD_AND_VERIFY
-```
-
-This separates the ML prediction from the business decision layer.
+Transactions with fraud probability ≥ `0.60` are flagged for verification.
 
 ---
 
-# 🔎 Explainable Risk Signals
+# 🧠 4. Calibrated Machine Learning Model
 
-Sentinel does not only provide a fraud probability.
+Sentinel uses a **Random Forest classifier with probability calibration**.
 
-The Risk Engine also identifies important transaction features contributing to the model's decision.
+The model development process included:
 
-Example:
+1. Baseline Logistic Regression
+2. Random Forest experimentation
+3. Multiple Random Forest configurations
+4. Threshold evaluation
+5. Deeper Random Forest evaluation
+6. Probability calibration
+7. Hold-out test evaluation
+8. Integration into the production risk engine
+
+The production model is:
 
 ```text
-Top Risk Signals
-
-V14  → 18.33%
-V10  → 11.46%
-V4   → 11.42%
-V12  → 9.87%
-V17  → 8.94%
+RF_DEEPER_CALIBRATED
 ```
 
-Each signal is displayed with:
+Model artifact:
 
-* Feature name
-* Feature value
-* Model importance
-* Impact percentage
-* Signal severity
-
-This provides a basic explainability layer for fraud analysts.
+```text
+ml/models/RF_DEEPER_CALIBRATED.joblib
+```
 
 ---
 
-# 📊 CSV Transaction Analyzer
+# 📈 5. Model Performance
 
-Sentinel supports **batch transaction analysis through CSV uploads**.
+The final model was evaluated using a **held-out test dataset**.
 
-Users can navigate to the **CSV Analyzer** page and upload a compatible transaction dataset.
+| Metric             | Performance |
+| ------------------ | ----------- |
+| Precision          | **94.94%**  |
+| Recall             | **76.53%**  |
+| F1 Score           | **84.75%**  |
+| ROC-AUC            | **97.02%**  |
+| Test Transactions  | **56,962**  |
+| Actual Fraud Cases | **98**      |
 
-### Required columns
+These metrics represent the final evaluation configuration used by Sentinel.
+
+---
+
+## False-Positive Analysis
+
+Sentinel also tracks false positives because unnecessary alerts can create additional merchant review costs.
+
+Final evaluation:
+
+```text
+False Positives    : 14
+False-Positive Rate: 0.0246%
+```
+
+For operational-cost illustration, Sentinel uses an illustrative merchant-configured review cost of:
+
+```text
+₹100 per false positive
+```
+
+Estimated operational review cost:
+
+```text
+14 × ₹100 = ₹1,400
+```
+
+> The ₹100 review cost is an illustrative merchant-configured assumption, not a model-derived financial loss estimate. Model metrics are measured on the held-out test set.
+
+---
+
+# 📊 6. CSV Transaction Analyzer
+
+Sentinel supports **batch transaction analysis through CSV upload**.
+
+Users can upload a CSV containing transaction records, and Sentinel processes the dataset through the production risk engine.
+
+### Required Columns
 
 ```text
 Time
@@ -262,87 +241,97 @@ V28
 Amount
 ```
 
-The uploaded CSV is processed by the production fraud-risk model.
-
-### CSV Analyzer provides
-
-* Total transactions analyzed
-* High-risk transactions
-* Medium-risk transactions
-* Low-risk transactions
-* Fraud alerts
-* Average risk score
-* Fraud probability for each transaction
-* Risk classification
-* Recommended decision
-
-### Example workflow
-
-```text
-Upload CSV
-     ↓
-Validate Required Columns
-     ↓
-Load Transaction Data
-     ↓
-Run ML Predictions
-     ↓
-Calculate Risk Scores
-     ↓
-Classify Risk
-     ↓
-Generate Fraud Alerts
-     ↓
-Display Results
-```
-
-A sample CSV is included in the repository:
+A ready-to-use sample dataset is included in:
 
 ```text
 data/sample/sample_transactions.csv
 ```
 
-The raw source dataset is intentionally not committed to the repository to keep the project lightweight.
+### CSV Analysis Output
+
+For every transaction, Sentinel generates:
+
+* Fraud probability
+* Risk score
+* Risk level
+* Decision
+
+The batch analysis also provides:
+
+* Total transactions
+* High-risk transactions
+* Medium-risk transactions
+* Low-risk transactions
+* Fraud alerts
+* Average risk score
 
 ---
 
-# 🧪 Transaction Simulation
+# 🧪 7. Transaction Simulation
 
 Sentinel includes an interactive transaction simulator.
 
-Users can modify transaction characteristics such as:
+Users can modify factors such as:
 
 * Transaction amount
-* Transaction time
 * Device status
 * Transaction frequency
-* Unusual transaction timing
+* Unusual transaction time
 
-These inputs are transformed into the model's feature space and passed through the same risk engine.
+The simulator converts these inputs into a transaction feature representation and sends it to the risk engine.
 
-This allows users to observe how changes in transaction behavior can affect the resulting risk assessment.
+This demonstrates how transaction characteristics can influence the resulting risk assessment.
 
 ---
 
-# 🚨 Risk Queue
+# 🏪 8. Merchant Configuration & Risk Alerts
 
-The Risk Queue provides a centralized view of potentially dangerous transactions.
+Sentinel provides a merchant configuration interface where merchants can configure:
 
-Transactions can be reviewed based on:
+* Business name
+* Merchant email
+* Phone number
+* Alert threshold
+* Merchant alerts
+* High-risk alerts
+
+When a transaction crosses the configured risk threshold, Sentinel generates an **in-app merchant risk alert** containing the risk score and recommended action.
+
+Example:
+
+```text
+HIGH-RISK TRANSACTION DETECTED
+
+Risk Score : 82.41
+Decision   : HOLD & VERIFY
+
+Alert Recipient:
+merchant@example.com
+```
+
+The current prototype stores merchant configuration locally in the browser.
+
+---
+
+# 🚨 9. Risk Queue
+
+The Risk Queue provides a centralized view of suspicious transactions.
+
+It helps prioritize transactions that require manual verification.
+
+High-risk transactions can be reviewed based on:
 
 * Risk score
-* Risk probability
 * Risk level
-* Recommended action
-* Important risk signals
-
-This provides a workflow closer to how a merchant fraud analyst would investigate suspicious transactions.
+* Fraud probability
+* Decision
+* Transaction details
 
 ---
 
-# 📊 Analytics Dashboard
+# 📉 10. Analytics Dashboard
 
-The Analytics page provides an overview of model performance and risk intelligence.
+The Analytics section provides model and risk intelligence.
 
 It includes:
 
@@ -351,62 +340,107 @@ It includes:
 * F1 Score
 * ROC-AUC
 * Test transaction count
-* Fraud cases
-* Fraud detection coverage
-* False alerts
-* False alert rate
+* Actual fraud cases
+* Fraud detected
+* False positives
+* False-positive rate
+* Illustrative false-positive review cost
 * Active model
-* Top risk signals
 
-This allows the user to understand both the **ML performance** and the **operational impact** of the model.
+The dashboard also displays important Random Forest features.
+
+### Top Risk Signals
+
+```text
+V14
+V10
+V4
+V12
+V17
+```
+
+---
+
+# 🔎 11. Explainable Risk Signals
+
+Sentinel does not stop at:
+
+```text
+"This transaction is fraudulent."
+```
+
+Instead, the risk engine provides important model signals.
+
+Example:
+
+```json
+{
+  "feature": "V14",
+  "value": -7.2455,
+  "importance": 0.1833,
+  "impact": 18.3,
+  "severity": "Strong signal"
+}
+```
+
+This provides additional context for why a transaction received a particular risk assessment.
 
 ---
 
 # 🏗️ System Architecture
 
 ```text
-                     SENTINEL
-                         │
-                         ▼
-              ┌────────────────────┐
-              │    React Frontend  │
-              │      + Vite        │
-              └─────────┬──────────┘
-                        │
-                        │ REST API
-                        ▼
-              ┌────────────────────┐
-              │   FastAPI Backend  │
-              └─────────┬──────────┘
-                        │
-          ┌─────────────┼─────────────┐
-          │             │             │
-          ▼             ▼             ▼
-   Risk Engine     CSV Analyzer   Simulation
-          │             │
-          └──────┬──────┘
-                 ▼
-        ┌───────────────────┐
-        │ Calibrated Random │
-        │   Forest Model    │
-        └─────────┬─────────┘
-                  │
-                  ▼
-          Fraud Probability
-                  │
-                  ▼
-            Risk Score
-                  │
-                  ▼
-          Risk Classification
-                  │
-                  ▼
-        Recommended Decision
+                     ┌──────────────────────┐
+                     │      Merchant        │
+                     │       / User         │
+                     └──────────┬───────────┘
+                                │
+                                ▼
+                     ┌──────────────────────┐
+                     │    React Frontend    │
+                     │       Vite           │
+                     │      Vercel          │
+                     └──────────┬───────────┘
+                                │
+                         REST API Requests
+                                │
+                                ▼
+                     ┌──────────────────────┐
+                     │    FastAPI Backend   │
+                     │       Render         │
+                     └──────────┬───────────┘
+                                │
+                                ▼
+                     ┌──────────────────────┐
+                     │   Sentinel Risk      │
+                     │       Engine         │
+                     └──────────┬───────────┘
+                                │
+                                ▼
+              ┌──────────────────────────────────┐
+              │     RF_DEEPER_CALIBRATED        │
+              │                                  │
+              │ Random Forest + Calibration      │
+              └────────────────┬─────────────────┘
+                               │
+                               ▼
+                     ┌──────────────────────┐
+                     │ Fraud Probability    │
+                     │ Risk Score           │
+                     │ Risk Level           │
+                     │ Decision             │
+                     │ Risk Signals         │
+                     └──────────┬───────────┘
+                                │
+                                ▼
+                     ┌──────────────────────┐
+                     │ Merchant Risk Alert  │
+                     └──────────────────────┘
 ```
 
 ---
 
-# 🛠️ Technology Stack
+# 🧰 Technology Stack
 
 ## Frontend
 
@@ -423,22 +457,22 @@ This allows the user to understand both the **ML performance** and the **operati
 * Uvicorn
 * Pydantic
 * Pandas
-* Python Multipart
+* python-multipart
 
 ## Machine Learning
 
 * Scikit-learn
 * Random Forest
-* Probability Calibration
-* Pandas
+* CalibratedClassifierCV
 * NumPy
+* Pandas
 * Joblib
 
 ## Deployment
 
 * Vercel — Frontend
 * Render — Backend API
-* GitHub — Source Code & Version Control
+* GitHub — Source Control
 
 ---
 
@@ -453,33 +487,62 @@ Sentinel/
 │   ├── transaction_service.py
 │   └── csv_analyzer.py
 │
-├── data/
-│   ├── processed/
-│   └── sample/
-│       └── sample_transactions.csv
-│
 ├── frontend/
+│   ├── public/
 │   ├── src/
+│   │   ├── assets/
 │   │   ├── App.jsx
 │   │   ├── App.css
-│   │   ├── index.css
+│   │   ├── CSVAnalyzer.jsx
+│   │   ├── CSVAnalyzer.css
 │   │   ├── Simulation.jsx
 │   │   ├── Simulation.css
-│   │   ├── CSVAnalyzer.jsx
-│   │   └── CSVAnalyzer.css
-│   └── package.json
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   └── vite.config.js
 │
 ├── ml/
 │   ├── models/
-│   │   └── RF_DEEPER_CALIBRATED.joblib
+│   │   ├── RF_100.joblib
+│   │   ├── RF_300.joblib
+│   │   ├── RF_DEEPER.joblib
+│   │   ├── RF_DEEPER_CALIBRATED.joblib
+│   │   ├── baseline_logistic_regression.joblib
+│   │   └── sentinel_random_forest.joblib
 │   │
 │   └── src/
 │       ├── calibrate_model.py
+│       ├── compare_rf_models.py
+│       ├── eda.py
 │       ├── evaluate_calibrated_test.py
-│       ├── train_random_forest.py
+│       ├── evaluate_deeper_thresholds.py
+│       ├── evaluate_rf_thresholds.py
 │       ├── evaluate_thresholds.py
-│       └── final_evaluation.py
+│       ├── feature_importance.py
+│       ├── final_evaluation.py
+│       ├── prepare_data.py
+│       ├── train_baseline.py
+│       └── train_random_forest.py
 │
+├── data/
+│   ├── sample/
+│   │   └── sample_transactions.csv
+│   │
+│   └── processed/
+│       ├── calibrated_test_results.csv
+│       ├── deeper_threshold_results.csv
+│       ├── feature_importance.csv
+│       ├── final_test_results.csv
+│       ├── rf_threshold_results.csv
+│       ├── test.csv
+│       ├── threshold_results.csv
+│       └── validation.csv
+│
+├── package.json
+├── package-lock.json
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -489,17 +552,47 @@ Sentinel/
 
 # 🔌 API Endpoints
 
+## Root
+
+```http
+GET /
+```
+
+Returns service status.
+
 ## Health Check
 
 ```http
 GET /health
 ```
 
-Returns the backend and model status.
+Example:
 
----
+```json
+{
+  "status": "healthy",
+  "model": "RF_DEEPER_CALIBRATED",
+  "model_loaded": true
+}
+```
 
-## Normal Transaction Demo
+## Assess Transaction
+
+```http
+POST /api/v1/risk/assess
+```
+
+Accepts:
+
+```text
+Time
+V1-V28
+Amount
+```
+
+Returns the risk assessment.
+
+## Demo Normal Transaction
 
 ```http
 GET /api/v1/demo/normal
@@ -507,9 +600,7 @@ GET /api/v1/demo/normal
 
 Returns a sample low-risk transaction.
 
----
-
-## Fraud Transaction Demo
+## Demo Fraud Transaction
 
 ```http
 GET /api/v1/demo/fraud
@@ -517,27 +608,13 @@ GET /api/v1/demo/fraud
 
 Returns a sample high-risk transaction.
 
----
-
-## Risk Assessment
-
-```http
-POST /api/v1/risk/assess
-```
-
-Accepts a transaction and returns its risk assessment.
-
----
-
 ## Transaction Simulation
 
 ```http
 POST /api/v1/simulation
 ```
 
-Runs a simulated transaction through the risk engine.
-
----
+Accepts simulation parameters and returns the resulting risk assessment.
 
 ## CSV Analysis
 
@@ -545,108 +622,9 @@ Runs a simulated transaction through the risk engine.
 POST /api/v1/analyze/csv
 ```
 
-Accepts a CSV file and performs batch fraud-risk analysis.
-
----
-
-# 💻 Local Development
-
-## 1. Clone the repository
-
-```bash
-git clone https://github.com/HarishAnandh/Sentinel.git
-cd Sentinel
-```
-
----
-
-## 2. Create virtual environment
-
-```bash
-python -m venv .venv
-```
-
-Activate it:
-
-### macOS / Linux
-
-```bash
-source .venv/bin/activate
-```
-
----
-
-## 3. Install backend dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-Make sure multipart support is installed:
-
-```bash
-pip install python-multipart
-```
-
----
-
-## 4. Start FastAPI
-
-From the project root:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Backend:
-
-```text
-http://127.0.0.1:8000
-```
-
-API documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
----
-
-# 🎨 Frontend Development
-
-Navigate to the frontend:
-
-```bash
-cd frontend
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start development server:
-
-```bash
-npm run dev
-```
-
-The Vite development server will provide the local frontend URL.
-
----
-
-# 🧪 Testing the CSV Analyzer
+Accepts a CSV file through multipart form upload.
 
 Example:
-
-```bash
-curl -X POST \
-  -F "file=@data/sample/sample_transactions.csv" \
-  http://127.0.0.1:8000/api/v1/analyze/csv
-```
-
-Production API:
 
 ```bash
 curl -X POST \
@@ -656,143 +634,548 @@ curl -X POST \
 
 ---
 
-# 🌐 Production Deployment
+# 💻 Running Sentinel Locally
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/HarishAnandh/Sentinel.git
+cd Sentinel
+```
+
+---
+
+# 🐍 Backend Setup
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the FastAPI server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+# ⚛️ Frontend Setup
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The Vite development server will provide a local URL, typically:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# 📊 Testing the CSV Analyzer Locally
+
+After starting the backend, use:
+
+```text
+data/sample/sample_transactions.csv
+```
+
+You can test the API using:
+
+```bash
+curl -X POST \
+  -F "file=@data/sample/sample_transactions.csv" \
+  http://127.0.0.1:8000/api/v1/analyze/csv
+```
+
+The response contains both batch-level statistics and transaction-level risk results.
+
+---
+
+# 🧪 Machine Learning Pipeline
+
+The ML development process follows a structured workflow:
+
+```text
+Raw Credit Card Dataset
+          │
+          ▼
+    Data Preparation
+          │
+          ▼
+   Exploratory Analysis
+          │
+          ▼
+ Baseline Model Training
+          │
+          ▼
+ Random Forest Training
+          │
+          ▼
+ Model Comparison
+          │
+          ▼
+ Threshold Evaluation
+          │
+          ▼
+ Deeper RF Evaluation
+          │
+          ▼
+ Probability Calibration
+          │
+          ▼
+ Hold-Out Test Evaluation
+          │
+          ▼
+ Production Risk Engine
+```
+
+---
+
+# 📚 ML Development Files
+
+### Data Preparation
+
+```text
+ml/src/prepare_data.py
+```
+
+Prepares the dataset for training and evaluation.
+
+### Baseline Model
+
+```text
+ml/src/train_baseline.py
+```
+
+Creates the baseline Logistic Regression model.
+
+### Random Forest
+
+```text
+ml/src/train_random_forest.py
+```
+
+Trains Random Forest models.
+
+### Model Comparison
+
+```text
+ml/src/compare_rf_models.py
+```
+
+Compares different Random Forest configurations.
+
+### Threshold Evaluation
+
+```text
+ml/src/evaluate_thresholds.py
+ml/src/evaluate_rf_thresholds.py
+ml/src/evaluate_deeper_thresholds.py
+```
+
+Evaluates different probability thresholds and their effect on model performance.
+
+### Calibration
+
+```text
+ml/src/calibrate_model.py
+```
+
+Calibrates the Random Forest probability estimates.
+
+### Calibrated Evaluation
+
+```text
+ml/src/evaluate_calibrated_test.py
+```
+
+Evaluates the calibrated model on the test dataset.
+
+### Feature Importance
+
+```text
+ml/src/feature_importance.py
+```
+
+Extracts the most influential model features.
+
+---
+
+# 🧱 Build Challenges & Technical Obstacles
+
+Building Sentinel involved several practical engineering challenges.
+
+## 1. Probability Calibration
+
+The Random Forest model's raw probabilities were not initially sufficient for a production-style risk scoring system.
+
+A calibration stage was introduced to make probability estimates more useful for downstream decision-making.
+
+---
+
+## 2. Precision vs Recall Trade-off
+
+Fraud detection requires balancing:
+
+```text
+Detecting more fraud
+        ↕
+Avoiding unnecessary alerts
+```
+
+Different thresholds were evaluated to identify a practical operating point.
+
+The final model achieved a precision-focused operating point with:
+
+```text
+Precision: 94.94%
+Recall:    76.53%
+F1 Score:  84.75%
+```
+
+---
+
+## 3. CalibratedClassifierCV Feature Importance
+
+One technical issue occurred when the production model was changed from a normal Random Forest to:
+
+```text
+CalibratedClassifierCV
+```
+
+Unlike Random Forest, `CalibratedClassifierCV` does not directly expose:
+
+```python
+feature_importances_
+```
+
+The feature-importance logic was therefore adapted to work with the underlying calibrated estimator.
+
+---
+
+## 4. FastAPI Application Structure
+
+The project initially experienced an import issue when running:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend structure was reorganized so that the application could correctly load:
+
+```text
+app.main:app
+```
+
+---
+
+## 5. CSV Upload Support
+
+Adding CSV upload introduced a multipart form-data dependency.
+
+FastAPI requires:
+
+```text
+python-multipart
+```
+
+for file uploads.
+
+The dependency was added to the project requirements and the CSV Analyzer was integrated into the API.
+
+---
+
+## 6. Production API Connectivity
+
+The frontend initially used:
+
+```text
+http://127.0.0.1:8000
+```
+
+which works only on the local machine.
+
+For production deployment, the frontend was updated to communicate with the Render backend:
+
+```text
+https://sentinel1-wqdp.onrender.com
+```
+
+This allows the Vercel deployment to communicate with the production FastAPI server.
+
+---
+
+# 🌐 Deployment Architecture
+
+```text
+GitHub
+   │
+   ├───────────────┐
+   │               │
+   ▼               ▼
+Vercel           Render
+   │               │
+React App      FastAPI API
+   │               │
+   └───────┬───────┘
+           │
+           ▼
+   Sentinel Risk Engine
+           │
+           ▼
+ RF_DEEPER_CALIBRATED
+```
+
+---
+
+# 🌍 Deployment Notes
 
 ### Frontend
 
-Deployed using:
+Hosted on:
 
 ```text
 Vercel
 ```
 
-Live application:
+Live URL:
 
-[https://sentinel-tawny-psi.vercel.app](https://sentinel-tawny-psi.vercel.app)
+```text
+https://sentinel-tawny-psi.vercel.app
+```
 
 ### Backend
 
-Deployed using:
+Hosted on:
 
 ```text
 Render
 ```
 
-Production API:
-
-[https://sentinel1-wqdp.onrender.com](https://sentinel1-wqdp.onrender.com)
-
-The frontend communicates with the deployed FastAPI backend through REST APIs.
-
----
-
-# ⚠️ Browser Troubleshooting
-
-Sentinel does **not** require Incognito/Private browsing.
-
-During development and production testing, a browser-side issue was observed where the CSV Analyzer could occasionally display:
+API URL:
 
 ```text
-ERR_NETWORK_CHANGED
+https://sentinel1-wqdp.onrender.com
 ```
 
-along with an asynchronous browser listener message.
-
-The application worked correctly in an Incognito/Private window, indicating that the issue was browser-session or extension related rather than a Sentinel backend/model failure.
-
-If the CSV Analyzer does not work in a normal browser session:
-
-1. Try a hard refresh.
-2. Temporarily disable browser extensions.
-3. Clear the site's cached data.
-4. Try an Incognito/Private window.
-
-> **Incognito mode is only a troubleshooting workaround and is not required for Sentinel.**
+The frontend communicates with the production backend using REST APIs.
 
 ---
 
-# 🔐 Data & Repository Notes
+# 🔐 Authentication & Security
 
-The repository intentionally excludes:
+### Prototype Authentication
 
-* Raw datasets
-* Python virtual environments
-* Node modules
-* Build output
-* Python cache files
-* Other unnecessary generated files
+The current merchant login interface is a **prototype/demo login** and does not implement production authentication.
 
-The project includes the processed evaluation artifacts and production ML model required to demonstrate the fraud-risk system.
+Merchant configuration is currently stored locally in the browser.
+
+A production implementation would use:
+
+* Authenticated merchant accounts
+* Server-side persistence
+* Merchant-level data isolation
+* Role-based access control
+* Secure session management
+
+### Production Security Requirements
+
+For a production financial deployment, additional security layers would be required, including:
+
+* Authentication
+* Authorization
+* Rate limiting
+* API key management
+* Secure file validation
+* File-size limits
+* Input sanitization
+* Audit logging
+* Encryption
+* PII protection
+* Model monitoring
+* Data drift detection
 
 ---
 
-# 🎯 Key Highlights
+# 🛡️ Defense-Only Design
 
-### 🤖 Machine Learning
+Sentinel is designed exclusively for fraud prevention and merchant risk management.
 
-Calibrated Random Forest fraud detection model.
+The system focuses on:
 
-### 📈 High Precision
+* Fraud detection
+* Risk scoring
+* Transaction review
+* Transaction holding
+* Merchant notification
+* False-positive analysis
 
-Final evaluated precision of **94.94%**.
+It does not provide functionality for bypassing fraud detection, exploiting payment systems, or conducting fraudulent transactions.
 
-### 🎯 Risk Scoring
+---
 
-Converts fraud probabilities into an intuitive 0–100 risk score.
+# 📌 Current Scope
 
-### 🚨 Actionable Decisions
-
-Automatically recommends:
+Sentinel currently focuses on transaction-level fraud risk assessment using the credit-card transaction feature representation:
 
 ```text
-APPROVE
-HOLD_AND_VERIFY
+Time
+V1-V28
+Amount
 ```
 
-### 🔎 Explainability
+The prototype demonstrates the complete workflow:
 
-Provides important feature-level risk signals.
+```text
+Transaction
+     ↓
+ML Prediction
+     ↓
+Fraud Probability
+     ↓
+Risk Score
+     ↓
+Risk Classification
+     ↓
+Decision
+     ↓
+Merchant Risk Alert
+```
 
-### 📂 Batch Analysis
+The `V1`–`V28` features are anonymized/PCA-transformed features from the public fraud dataset used for model development.
 
-Users can upload compatible CSV datasets and analyze multiple transactions at once.
-
-### 🧪 Simulation
-
-Interactive transaction-risk simulation.
-
-### 📊 Analytics
-
-Dedicated model-performance and risk-intelligence dashboard.
-
-### 🌐 Production Ready
-
-React frontend deployed on Vercel with FastAPI backend deployed on Render.
+In a production deployment, merchant-native transaction attributes would be transformed into the model's required feature representation before inference.
 
 ---
 
-# 🏆 Project Vision
+# 🔮 Future Improvements
+
+Potential future enhancements include:
+
+* Production-grade merchant authentication
+* Multi-merchant account isolation
+* Persistent merchant configuration
+* Email/SMS alert integration
+* Merchant-native feature transformation
+* Real-time transaction ingestion
+* Historical risk analytics
+* Adaptive risk thresholds
+* Explainable AI using SHAP
+* Real-time fraud spike detection
+* Device fingerprinting
+* User behavioral profiling
+* Account takeover detection
+* Chargeback prediction
+* Return-abuse detection
+* Fraud ring detection
+* Model drift monitoring
+* Automated retraining
+* Feedback-driven model improvement
+* Database-backed transaction history
+* Role-based merchant access
+* Advanced alert management
+
+---
+
+# 🎯 Why Sentinel?
 
 Sentinel is designed around a simple principle:
 
-> **Don't just detect fraud — help merchants make better risk decisions.**
+> **Don't just detect fraud. Help merchants decide what to do about risk.**
 
-The system combines machine learning, probability calibration, explainability, batch analysis, simulation, and actionable decision logic into a single merchant-focused risk management platform.
+Instead of producing only a prediction, Sentinel converts machine-learning output into an operational risk workflow.
+
+```text
+                     SENTINEL
+                         │
+             ┌───────────┴───────────┐
+             │                       │
+        Detection               Intelligence
+             │                       │
+             ▼                       ▼
+      Fraud Probability        Risk Signals
+             │                       │
+             └───────────┬───────────┘
+                         │
+                         ▼
+                    Risk Score
+                         │
+                         ▼
+                 Risk Classification
+                         │
+                         ▼
+                   Decision Engine
+                         │
+                ┌────────┴────────┐
+                ▼                 ▼
+             APPROVE         HOLD & VERIFY
+                                  │
+                                  ▼
+                         Merchant Risk Alert
+```
 
 ---
 
-# 👨‍💻 Team / Project
+# 👨‍💻 Project
 
 **Sentinel — AI Risk Manager**
 
-Built as an AI/ML-focused fraud risk management solution for merchant transaction protection.
+Built as an AI/ML risk-management platform focused on practical merchant fraud detection, risk assessment, and decision support.
 
----
-
-## ⭐ Repository
+### Repository
 
 [https://github.com/HarishAnandh/Sentinel](https://github.com/HarishAnandh/Sentinel)
 
-If you find the project interesting, consider giving the repository a ⭐.
+### Live Application
 
+[https://sentinel-tawny-psi.vercel.app](https://sentinel-tawny-psi.vercel.app)
 
+### Backend API
+
+[https://sentinel1-wqdp.onrender.com](https://sentinel1-wqdp.onrender.com)
+
+---
+
+# ⭐ Acknowledgement
+
+Built with:
+
+* Python
+* FastAPI
+* Scikit-learn
+* Random Forest
+* React
+* Vite
+* Vercel
+* Render
+* GitHub
+
+---
+
+# 🛡️ Sentinel
+
+### Detect risk. Understand signals. Protect transactions.
+
+```
+```
