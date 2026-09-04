@@ -1142,25 +1142,4 @@ Built with:
 
 ### Detect risk. Understand signals. Protect transactions.
 
-````
-
-### One small correction before you push
-
-Your actual `health()` endpoint currently returns:
-
-```python
-"model": "RF_DEEPER"
-````
-
-while your production model file is:
-
-```text
-RF_DEEPER_CALIBRATED.joblib
-```
-
-So if you want the README and API to be **perfectly consistent**, later change that backend value to:
-
-```python
-"model": "RF_DEEPER_CALIBRATED"
-```
 
