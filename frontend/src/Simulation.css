@@ -241,3 +241,66 @@
   margin: 8px 0;
   color: #475569;
 }
+
+/* Merchant Risk Alert */
+
+.merchant-alert {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 22px;
+  padding: 16px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+}
+
+.merchant-alert-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.merchant-alert-content {
+  flex: 1;
+}
+
+.merchant-alert-content > strong {
+  display: block;
+  color: #991b1b;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.merchant-alert-content p {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.merchant-alert-details {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  color: #7f1d1d;
+  font-size: 12px;
+}
+
+.merchant-alert-details strong {
+  color: #991b1b;
+}
+
+.merchant-alert-recipient {
+  margin-top: 8px;
+  color: #991b1b;
+  font-size: 11px;
+  font-weight: 600;
+}

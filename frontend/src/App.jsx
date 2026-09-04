@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Simulation from "./Simulation";
 import "./index.css";
-
+import "./App.css";
 const API = "https://sentinel1-wqdp.onrender.com";
 
 
@@ -35,6 +35,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [activePage, setActivePage] = useState("dashboard");
+  const [showLanding, setShowLanding] = useState(true);
+  const [loginMode, setLoginMode] = useState(false);
+  const [merchantEmail, setMerchantEmail] = useState("");
 
   useEffect(() => {
     localStorage.setItem(
@@ -165,7 +168,91 @@ function App() {
         if (total === 0) return 0;
         return Math.round((count / total) * 100);
       };
-
+     
+      if (showLanding) {
+        return (
+          <div className="sentinel-landing">
+      
+            <div className="landing-card">
+      
+              <div className="landing-logo">
+                S
+              </div>
+      
+              <h1>Sentinel</h1>
+      
+              <p className="landing-subtitle">
+                AI-Powered Risk Manager
+              </p>
+      
+              <p className="landing-description">
+                Protect every transaction with intelligent fraud detection,
+                risk scoring and automated decisioning.
+              </p>
+      
+              {!loginMode ? (
+                <div className="landing-actions">
+      
+                  <button
+                    className="landing-primary"
+                    onClick={() => setLoginMode(true)}
+                  >
+                    Merchant Login
+                  </button>
+      
+                  <button
+                    className="landing-secondary"
+                    onClick={() => setShowLanding(false)}
+                  >
+                    Continue as Demo
+                  </button>
+      
+                </div>
+              ) : (
+                <div className="landing-login">
+      
+                  <label>Merchant Email</label>
+      
+                  <input
+                    type="email"
+                    placeholder="merchant@example.com"
+                    value={merchantEmail}
+                    onChange={(e) => setMerchantEmail(e.target.value)}
+                  />
+      
+                  <label>Password</label>
+      
+                  <input
+                    type="password"
+                    placeholder="Enter password"
+                  />
+      
+                  <button
+                    className="landing-primary"
+                    onClick={() => setShowLanding(false)}
+                  >
+                    Login to Dashboard
+                  </button>
+      
+                  <button
+                    className="landing-back"
+                    onClick={() => setLoginMode(false)}
+                  >
+                    ← Back
+                  </button>
+      
+                </div>
+              )}
+      
+              <div className="landing-footer">
+                <span>●</span> Sentinel Risk Engine Online
+              </div>
+      
+            </div>
+      
+          </div>
+        );
+      }
 
   return (
 
@@ -1289,17 +1376,17 @@ function AnalyticsPage() {
 
           <div>
             <span>Fraud detected</span>
-            <strong>75 / 98</strong>
+            <strong>82 / 98</strong>
           </div>
 
           <div>
-            <span>False alerts</span>
-            <strong>4</strong>
+            <span>False positives</span>
+            <strong>14</strong>
           </div>
 
           <div>
-            <span>False alert rate</span>
-            <strong>0.0070%</strong>
+            <span>False-positive rate</span>
+            <strong>0.0246%</strong>
           </div>
 
           <div>
@@ -1307,8 +1394,21 @@ function AnalyticsPage() {
             <strong>0.60</strong>
           </div>
 
-        </div>
+          <div>
+            <span>Review cost / FP</span>
+            <strong>₹100</strong>
+          </div>
 
+          <div>
+            <span>Estimated FP cost</span>
+            <strong>₹1,400</strong>
+          </div>
+
+          </div>
+          <p className="false-positive-note">
+  False-positive cost is an illustrative merchant-configured review cost
+  of ₹100 per false positive. Model metrics are measured on the held-out test set.
+</p>
       </div>
 
 
@@ -1363,6 +1463,41 @@ function AnalyticsPage() {
   );
 }
 function SettingsPage() {
+  const [merchant, setMerchant] = useState(() => {
+    const saved = localStorage.getItem("sentinelMerchantSettings");
+
+    return saved
+      ? JSON.parse(saved)
+      : {
+          businessName: "Sentinel Demo Store",
+          email: "merchant@example.com",
+          phone: "",
+          alertsEnabled: true,
+          highRiskAlerts: true,
+          alertThreshold: 70,
+        };
+  });
+
+  const [savedMessage, setSavedMessage] = useState("");
+
+  const updateMerchant = (field, value) => {
+    setMerchant((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setSavedMessage("");
+  };
+
+  const saveMerchantSettings = () => {
+    localStorage.setItem(
+      "sentinelMerchantSettings",
+      JSON.stringify(merchant)
+    );
+
+    setSavedMessage("Merchant settings saved successfully.");
+  };
+
   return (
     <section className="page">
 
@@ -1370,10 +1505,171 @@ function SettingsPage() {
         <div>
           <h1>Settings</h1>
           <p>
-            Sentinel system and model configuration
+            Merchant alerts and Sentinel system configuration
           </p>
         </div>
       </div>
+
+      {/* MERCHANT SETTINGS */}
+
+      <div className="card merchant-settings-card">
+
+        <div className="card-header">
+          <div>
+            <h2>Merchant Configuration</h2>
+            <p>
+              Configure where Sentinel sends risk alerts
+            </p>
+          </div>
+
+          <span className="status-badge">
+            CONFIGURED
+          </span>
+        </div>
+
+        <div className="merchant-form">
+
+          <div className="form-group">
+            <label>Business Name</label>
+
+            <input
+              type="text"
+              value={merchant.businessName}
+              onChange={(e) =>
+                updateMerchant("businessName", e.target.value)
+              }
+              placeholder="Your business name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Merchant Email</label>
+
+            <input
+              type="email"
+              value={merchant.email}
+              onChange={(e) =>
+                updateMerchant("email", e.target.value)
+              }
+              placeholder="merchant@example.com"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Phone Number</label>
+
+            <input
+              type="tel"
+              value={merchant.phone}
+              onChange={(e) =>
+                updateMerchant("phone", e.target.value)
+              }
+              placeholder="+91 XXXXX XXXXX"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Alert Threshold</label>
+
+            <div className="threshold-row">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={merchant.alertThreshold}
+                onChange={(e) =>
+                  updateMerchant(
+                    "alertThreshold",
+                    Number(e.target.value)
+                  )
+                }
+              />
+
+              <span>Risk score</span>
+            </div>
+
+            <small>
+              Transactions at or above this score can trigger a
+              merchant alert.
+            </small>
+          </div>
+
+        </div>
+
+        <div className="alert-settings">
+
+          <h3>Alert Preferences</h3>
+
+          <div className="setting-toggle-row">
+            <div>
+              <strong>Merchant Alerts</strong>
+              <span>
+                Enable Sentinel risk notifications
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className={`toggle ${
+                merchant.alertsEnabled ? "active" : ""
+              }`}
+              onClick={() =>
+                updateMerchant(
+                  "alertsEnabled",
+                  !merchant.alertsEnabled
+                )
+              }
+            >
+              <span />
+            </button>
+          </div>
+
+          <div className="setting-toggle-row">
+            <div>
+              <strong>High-Risk Alerts</strong>
+              <span>
+                Notify merchant when a transaction is high risk
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className={`toggle ${
+                merchant.highRiskAlerts ? "active" : ""
+              }`}
+              onClick={() =>
+                updateMerchant(
+                  "highRiskAlerts",
+                  !merchant.highRiskAlerts
+                )
+              }
+            >
+              <span />
+            </button>
+          </div>
+
+        </div>
+
+        <div className="merchant-save-row">
+
+          <button
+            className="save-settings-button"
+            onClick={saveMerchantSettings}
+          >
+            Save Merchant Settings
+          </button>
+
+          {savedMessage && (
+            <span className="saved-message">
+              ✓ {savedMessage}
+            </span>
+          )}
+
+        </div>
+
+      </div>
+
+      {/* AI RISK ENGINE */}
 
       <div className="card settings-card">
 
@@ -1404,7 +1700,9 @@ function SettingsPage() {
           <div className="setting-row">
             <div>
               <strong>Decision Threshold</strong>
-              <span>Probability threshold for fraud classification</span>
+              <span>
+                Probability threshold for fraud classification
+              </span>
             </div>
 
             <strong>0.60</strong>
@@ -1422,7 +1720,9 @@ function SettingsPage() {
           <div className="setting-row">
             <div>
               <strong>High Risk Action</strong>
-              <span>Recommended action for high-risk transactions</span>
+              <span>
+                Recommended action for high-risk transactions
+              </span>
             </div>
 
             <strong>HOLD & VERIFY</strong>

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./Simulation.css";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://sentinel1-wqdp.onrender.com";
 function RiskRing({ score }) {
   const value = Number(score) || 0;
 
@@ -40,7 +40,13 @@ function Simulation() {
 
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const merchantSettings = JSON.parse(
+    localStorage.getItem("sentinelMerchantSettings") || "{}"
+  );
+  
+  const merchantAlertsEnabled =
+    merchantSettings.alertsEnabled !== false &&
+    merchantSettings.highRiskAlerts !== false;
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -227,7 +233,55 @@ function Simulation() {
             </p>
 
           </div>
+          {result.risk?.risk_level === "HIGH" &&
+              merchantAlertsEnabled && (
+                <div className="merchant-alert">
 
+                  <div className="merchant-alert-icon">
+                    !
+                  </div>
+
+                  <div className="merchant-alert-content">
+                    <strong>High-Risk Transaction Detected</strong>
+
+                    <p>
+                      Sentinel recommends holding this transaction for merchant
+                      verification.
+                      {merchantSettings.businessName && (
+                        <>
+                          {" "}
+                          Alert generated for{" "}
+                          <strong>{merchantSettings.businessName}</strong>.
+                        </>
+                      )}
+                    </p>
+
+                    <div className="merchant-alert-details">
+                      <span>
+                        Risk Score:{" "}
+                        <strong>
+                          {Number(result.risk?.risk_score || 0).toFixed(2)}
+                        </strong>
+                      </span>
+                      {merchantSettings.email && (
+                        <div className="merchant-alert-recipient">
+                          Alert recipient: {merchantSettings.email}
+                        </div>
+                      )}
+
+                      <span>
+                        Decision:{" "}
+                        <strong>
+                          {result.risk?.decision === "HOLD_AND_VERIFY"
+                            ? "HOLD & VERIFY"
+                            : result.risk?.decision}
+                        </strong>
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+              )}
           {result.risk?.signals?.length > 0 && (
             <div className="signals">
 
